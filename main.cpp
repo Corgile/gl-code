@@ -33,10 +33,19 @@ int main() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	/// vertices coordinates
-	GLfloat vertices[] = {
+	GLfloat vertices[]{
 			-.5f, -.5f * float(sqrt(3)) / 3, .0f,
 			.5f, -.5f * float(sqrt(3)) / 3, .0f,
-			.0f, .5f * float(sqrt(3)) * 2 / 3, .0f
+			.0f, float(sqrt(3)) / 3, .0f,
+			-.5f / 2, .5f * float(sqrt(3)) / 6, .0f,
+			.5f / 2, .5f * float(sqrt(3)) / 6, .0f,
+			.0f, -.5f * float(sqrt(3)) / 3.0f, .0f
+	};
+	/// index buffer
+	GLuint indices[]{
+			0, 3, 5,
+			3, 2, 4,
+			5, 4, 1
 	};
 
 	/// Create a windowed mode window and its OpenGL context
@@ -82,18 +91,23 @@ int main() {
 	glDeleteShader(fragmentShader);
 
 	/// create reference containers for the vertex array object and vertex buffer object
-	GLuint vao, vbo;
+	GLuint vao, vbo, ebo;
 	/// generate the vao and vbo with 1 object each
-	glGenVertexArrays(1, &vao);//must before vbo init.
+	glGenVertexArrays(1, &vao);//comes must before vbo init.
 	glGenBuffers(1, &vbo);
+	glGenBuffers(1, &ebo);
 
 	/// make the vao the current vertex array object by binding it
 	glBindVertexArray(vao);
 
-	/// bind thr vbo specifying it's a GL_ARRAY_BUFFER
+	/// bind the vbo specifying it's a GL_ARRAY_BUFFER
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	/// introduce the vertices into the vbo
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	/// bind...
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	/// configure the vertex attribute so that OpenGL knows how to read the vbo
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
@@ -104,31 +118,31 @@ int main() {
 	/// because the usage is GL_STATIC_DRAW
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	/// give the rendering frame a initial color
-	glClearColor(.07f, .13f, .17f, 1.f);
-	/// clear bg color and assign a new color to it
-	glClear(GL_COLOR_BUFFER_BIT);
-	/// swap buffer to update frame by frame.
-	glfwSwapBuffers(window);
 	/// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
+		/// give the rendering frame a initial color
 		glClearColor(.07f, .13f, .17f, 1.f);
+		/// clear bg color and assign a new color to it
 		glClear(GL_COLOR_BUFFER_BIT);
 		/// tell OpenGL which program is currently being used
 		glUseProgram(shaderProgram);
 		/// bind the vao so OpenGL knows to use it
 		glBindVertexArray(vao);
-		/// draw the triangle
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		/// draw the 4-triangle
+		// glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, nullptr);
+		/// swap buffer to update frame by frame.
 		glfwSwapBuffers(window);
-		/* Poll for and process events */
+		/// Poll for and process events
 		glfwPollEvents();
 	}
 
 	/// delete all objects that has been created.
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &vbo);
+	glDeleteBuffers(1, &ebo);
 	glDeleteProgram(shaderProgram);
 
 	glfwDestroyWindow(window);
