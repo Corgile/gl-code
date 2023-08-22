@@ -9,12 +9,14 @@
 
 /// vertices coordinates
 GLfloat vertices[]{
-		-.5f, -.5f * float(sqrt(3)) / 3, .0f,
-		.5f, -.5f * float(sqrt(3)) / 3, .0f,
-		.0f, float(sqrt(3)) / 3, .0f,
-		-.5f / 2, .5f * float(sqrt(3)) / 6, .0f,
-		.5f / 2, .5f * float(sqrt(3)) / 6, .0f,
-		.0f, -.5f * float(sqrt(3)) / 3.0f, .0f
+		//@formatter:off          COORDINATES                               /           RGB COLORS          //
+		 -.5f,      -.5f * float(sqrt(3)) / 3,     0.0f,  .8f,  .3f,   .02f,
+		 0.5f,      -0.5f * float(sqrt(3)) / 3,    0.0f,  .8f, .3f,  .02f,
+		0.0f,     .5f * float(sqrt(3)) * 2 / 3, 0.0f, 1.f, .6f,  .32f,
+		-.5f / 2, 0.5f * float(sqrt(3)) / 6,    0.0f, .9f, .45f, .17f,
+		0.5f / 2, 0.5f * float(sqrt(3)) / 6,    0.0f, .9f, .45f, .17f,
+		0.0f,     -.5f * float(sqrt(3)) / 3.0f, 0.0f, .8f, .3f,  .02f
+		//@formatter:on
 };
 /// index buffer
 GLuint indices[]{
@@ -64,12 +66,15 @@ int main() {
 	index_buffer ibo(indices, sizeof(indices));
 	ibo.bind();
 	/// link vbo to vao
-	vao.link_vbo(vbo, 0);
+	//vao.link_vbo(vbo, 0);
+	vao.link_attr(vbo, 0, 3, GL_FLOAT, 6 * sizeof(float), nullptr);
+	vao.link_attr(vbo, 1, 3, GL_FLOAT, 6 * sizeof(float), (void *) (3 * sizeof(float)));
 	/// unbind all to prevent accidentally modifying them
 	vao.unbind();
 	vbo.unbind();
 	ibo.unbind();
 
+	GLint uniId = glGetUniformLocation(shader_program.m_program_id, "scale");
 
 	/// Loop until the user closes the window
 	while (!glfwWindowShouldClose(window)) {
@@ -78,6 +83,7 @@ int main() {
 		/// clear bg color and assign a new color to it
 		glClear(GL_COLOR_BUFFER_BIT);
 		shader_program.activate();
+		glUniform1f(uniId, 1.5f);
 		/// bind the vao so OpenGL knows to use it
 		vao.bind();
 		/// draw the 4-triangle
