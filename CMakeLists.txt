@@ -13,4 +13,4 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 add_executable(${TARGET} main.cpp ${SOURCE_FILES})
 # glfw3 dependents on X11 for window creation
 
-target_link_libraries(${TARGET} glfw3 X11 OpenGL GLEW ${PROJECT_SOURCE_DIR}/lib/libglm_shared.so)
+target_link_libraries(${TARGET} glfw3 X11 OpenGL GLEW)
