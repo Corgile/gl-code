@@ -8,8 +8,14 @@ out vec2 texCoord;
 
 uniform float scale;
 
+// camera
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 project;
+
 void main() {
-    gl_Position = vec4(aPos.x*scale, aPos.y*scale, aPos.z*scale, 1.0);
+//    gl_Position = vec4(aPos.x*scale, aPos.y*scale, aPos.z*scale, 1.0);
+    gl_Position = project * view * model * vec4(aPos, 1.0);
     color = aColor;
     texCoord = aTex;
 }
